@@ -111,19 +111,18 @@ The Python utility performs:
 
 ---
 
-## Project Structure#
+## Project Structure
 
+```
 stm32-secure-bootloader-crc/
-│
 ├── Bootloader/
 ├── application/
 ├── firmware_sender.py
 ├── README.md
 ├── LICENSE
-├── .gitignore
+└── .gitignore
+```
 
-
----
 
 ## Design Objectives
 
