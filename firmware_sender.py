@@ -6,7 +6,7 @@ import zlib
 
 PORT = '/dev/ttyACM0'
 BAUD = 115200
-BIN_FILE = '/home/farhan/test_project/application/Debug/application.bin'
+BIN_FILE = '/home/farhan/test_project/Bootloader_project/application/Debug/application.bin'
 
 try:
     print("Opening serial port...")
