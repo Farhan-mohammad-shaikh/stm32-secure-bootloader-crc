@@ -1,139 +1,185 @@
-# stm32-secure-bootloader-crc
+# STM32 Secure Bootloader with CRC Validation & UART Firmware Update
 
-Secure UART bootloader for STM32F4 featuring sector-based flash programming, CRC32 firmware integrity verification, application validity flag management, and a Python-based firmware update utility.
+##  Overview
+This project implements a production-style custom bootloader for STM32 microcontrollers that supports UART-based firmware updates, CRC32 integrity verification, and safe application jumping. The system simulates a real embedded firmware lifecycle used in industrial, automotive, IoT, and robotics products.
 
----
+The bootloader receives a firmware binary via UART, writes it to flash memory, verifies its integrity using CRC32, and safely jumps to the application firmware only if validation is successful. If the firmware is invalid or corrupted, the system remains in bootloader mode to prevent unsafe execution.
 
-## Overview
-
-This project implements a custom production-style bootloader for the STM32F412 (Cortex-M4).  
-It enables reliable firmware updates over UART while ensuring firmware integrity and controlled execution transfer.
-
-The bootloader validates firmware before execution using CRC32 and a persistent application validity flag stored in Flash memory.
+This project focuses on:
+- Firmware lifecycle management
+- Flash memory partitioning
+- Boot sequence control
+- Embedded communication protocols
+- Reliability and fault-safe firmware design
 
 ---
 
 ## Key Features
-
-- UART-based firmware update (115200 baud)
-- Sector-based Flash erase (STM32F4 architecture)
-- 32-bit aligned Flash programming
-- CRC32 integrity verification (polynomial 0xEDB88320)
-- Application validity flag stored in Flash
-- Stack pointer validation before execution
-- Safe jump to application reset handler
-- Python-based host firmware uploader
-
----
-
-## Memory Layout
-
-| Region        | Address        | Description |
-|--------------|---------------|------------|
-| Bootloader   | 0x08000000    | Bootloader firmware |
-| Application  | 0x08010000    | User firmware |
-| Valid Flag   | 0x0801FFFC    | Application validity marker |
-
-The application firmware grows upward from `0x08010000`.  
-The last 4 bytes of the allocated sector are reserved for metadata.
+- Custom bootloader written in Embedded C (STM32 HAL)
+- UART-based firmware update protocol
+- CRC32 integrity verification after flash programming
+- Flash erase and programming using internal flash
+- Application validity flag mechanism
+- Safe jump to application firmware
+- Python-based firmware uploader tool
+- Real hardware testing on STM32 board
+- Structured boot flow logging via UART
 
 ---
 
-## Firmware Update Flow
-
-1. Bootloader waits for `START` command via UART.
-2. Application validity flag is cleared.
-3. Flash sectors assigned to the application are erased.
-4. Firmware header is received containing:
-   - Magic number (0xDEADBEEF)
-   - Version
-   - Firmware size
-   - CRC32 checksum
-5. Firmware is written word-by-word to Flash.
-6. CRC32 is calculated directly from Flash memory.
-7. If CRC matches:
-   - Validity flag is written (0xA5A5A5A5)
-   - Bootloader jumps to application reset handler.
-8. If CRC fails:
-   - Update is rejected
-   - Bootloader remains active.
+##  System Architecture
+PC (Firmware.bin)  
+        ↓ (UART Serial Protocol)  
+STM32 Bootloader (Flash Sector 0)  
+        ↓  
+Flash Memory (Application Region)  
+        ↓  
+CRC Verification + Validity Flag Check  
+        ↓  
+Jump to Application Firmware (if valid)    
 
 ---
 
-## Application Validation
+##  Flash Memory Layout (Example)
+| Region      | Address Range        | Description                  |
+|-------------|----------------------|------------------------------|
+| Bootloader  | 0x08000000 - 0x0800FFFF | Bootloader firmware       |
+| Application | 0x08010000 - 0x0801FFFB | Main application firmware |
+| Validity Flag | 0x0801FFFC          | Firmware validity marker     |
 
-An application is considered valid only if:
-
-- The initial stack pointer (first word of vector table) lies within SRAM range:
-  
-  0x20000000 – 0x20040000
-
-- The validity flag equals:
-
-  0xA5A5A5A5
-
-This prevents execution of corrupted or incomplete firmware images.
+Note: Flash addresses may vary depending on the STM32 microcontroller used.
 
 ---
 
-## CRC32 Implementation
-
-The firmware integrity check uses the standard CRC32 polynomial:
-
-0xEDB88320
-
-The CRC is computed over the flashed firmware region and compared with the transmitted header value before execution is allowed.
-
----
-
-## Firmware Upload Tool
-
-`firmware_sender.py`
-
-The Python utility performs:
-
-- Serial connection initialization
-- START handshake transmission
-- Firmware header transfer
-- 32-bit aligned binary streaming
-- Progress monitoring
-- Bootloader response handling
+## Hardware Used
+- STM32 Development Board (Nucleo STM32f412ZG)
+- ST-Link Debugger (on-board or external)
+- USB Cable (for programming and UART communication)
+- PC / Laptop (for firmware upload)
+- Optional: External UART adapter (if needed)
 
 ---
 
-## Hardware & Tools
-
-- MCU: STM32F412ZG (ARM Cortex-M4 with FPU)
-- IDE: STM32CubeIDE
-- Framework: STM32 HAL
-- Communication Interface: UART3
-- Host Utility: Python 3 with pyserial
-
----
-
-## Project Structure
-
-```
-stm32-secure-bootloader-crc/
-├── Bootloader/
-├── application/
-├── firmware_sender.py
-├── README.md
-├── LICENSE
-└── .gitignore
-```
-
-
-## Design Objectives
-
-- Reliable firmware update mechanism
-- Clear Flash memory partitioning
-- Controlled and safe execution transfer
-- Firmware integrity assurance
-- Production-oriented embedded architecture
+##  Software & Tools
+- STM32CubeIDE
+- STM32 HAL Drivers
+- Python 3.x
+- PySerial Library
+- GCC ARM Toolchain
+- Serial Terminal (PuTTY / TeraTerm / CoolTerm)
+- Git & GitHub
+- stmCUbePrograme
 
 ---
 
-## License
+## Boot Process Flow
+1. MCU resets and starts execution from Bootloader (0x08000000)
+2. Bootloader initializes peripherals (UART, Flash, CRC)
+3. Bootloader checks firmware validity flag
+4. If firmware is valid:
+   - Compute CRC of application region
+   - Compare with expected CRC
+   - Jump to application firmware
+5. If firmware is invalid or CRC fails:
+   - Enter UART firmware update mode
 
-MIT License
+---
+
+##  Firmware Update Flow
+START Command → Receive Firmware Header →  
+Flash Erase → Chunked Firmware Write →  
+CRC Verification → Set Valid Flag → System Reset → Jump to Application  
+
+---
+
+##  Bootloader Build Instructions
+1. Open STM32CubeIDE
+2. Import the Bootloader project
+3. Select the correct STM32 board configuration
+4. Verify flash memory settings and linker configuration
+5. Build the project (Ctrl + B)
+6. Flash the bootloader using ST-Link debugger
+7. Open serial terminal to monitor UART logs
+
+---
+
+##  Application Firmware Configuration
+The application firmware must be compiled with a custom linker script.
+
+Set the application start address to:
+0x08010000
+
+This ensures:
+- Bootloader and application do not overlap in flash
+- Safe memory partitioning
+- Correct vector table relocation during boot
+
+---
+
+##  Firmware Upload Tool (Python Script)
+A Python script is provided to send the compiled firmware (.bin) file via UART.
+
+### Install Dependencies
+```bash
+pip install pyserial
+
+python firmware_sender.py firmware.bin /dev/ttyUSB0
+
+##  CRC Integrity Verification
+
+- CRC32 is calculated after firmware is written to flash memory  
+- Ensures firmware integrity before execution  
+- Prevents execution of corrupted or incomplete firmware  
+- Improves system reliability and robustness  
+
+> Note: CRC provides integrity verification only. Cryptographic signatures (RSA/ECDSA) would be required for full secure boot authentication.
+
+---
+
+##  Failure Handling & Safety Behavior
+
+- If CRC validation fails → Bootloader remains in update mode  
+- If firmware validity flag is not set → Application is not executed  
+- Prevents jumping to corrupted firmware images  
+- Ensures safe and deterministic boot behavior  
+
+(Current version uses a single application slot without rollback mechanism.)
+
+---
+
+##  Testing & Validation
+
+- Successfully tested on real STM32 hardware  
+- Verified UART-based firmware update process  
+- Stable flash erase and programming operations  
+- Correct CRC validation before application jump  
+- Serial debugging logs used to trace boot sequence  
+
+*(Add UART log screenshot here for visual proof)*
+
+---
+
+---
+
+##  Key Learning Outcomes
+
+- Bootloader architecture design  
+- Flash memory partitioning & management  
+- Embedded firmware update mechanisms  
+- CRC-based firmware integrity validation  
+- UART communication protocol design  
+- Safe application jumping and boot flow control  
+- Real-world embedded system reliability concepts  
+
+---
+
+##  Current Limitations
+
+- No dual-slot firmware rollback (single-slot architecture)  
+- No cryptographic signature verification (CRC only)  
+- UART-only firmware update interface  
+- No OTA or CAN-based update support  
+
+---
+
+## 🔮 Future Improvements
