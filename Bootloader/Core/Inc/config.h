@@ -1,0 +1,13 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define SRAM_START         0x20000000
+#define SRAM_END           0x20040000
+
+#define APP_START_ADDRESS  0x08010000
+#define APP_FLAG_ADDRESS   0x0801FFFC
+#define APP_VALID_FLAG     0xA5A5A5A5
+
+#define FIRMWARE_MAGIC     0xDEADBEEF
+
+#endif
