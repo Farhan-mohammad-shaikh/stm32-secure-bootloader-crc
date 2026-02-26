@@ -182,4 +182,21 @@ python firmware_sender.py firmware.bin /dev/ttyUSB0
 
 ---
 
-## 🔮 Future Improvements
+##  Future Improvements
+
+- Dual-bank firmware rollback mechanism (A/B slots)  
+- Secure boot with digital signature (RSA/ECDSA)  
+- CAN bus firmware update (automotive use-case)  
+- Encrypted firmware transmission  
+- External flash support (QSPI / NOR Flash)  
+- OTA update via Embedded Linux gateway  
+
+---
+
+##  Author
+
+**Farhan Mohammad Shaikh**  
+M.Sc. Microelectronics & Embedded Systems – TU Hamburg  
+Embedded Firmware | RTOS | Embedded Linux | Low-Level Drivers  
+
+GitHub: https://github.com/Farhan-mohammad-shaikh
