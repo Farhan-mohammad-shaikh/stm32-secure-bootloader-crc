@@ -111,4 +111,30 @@ The Python utility performs:
 
 ---
 
-## Project Structure
+## Project Structure#
+
+stm32-secure-bootloader-crc/
+│
+├── Bootloader/
+├── application/
+├── firmware_sender.py
+├── README.md
+├── LICENSE
+├── .gitignore
+
+
+---
+
+## Design Objectives
+
+- Reliable firmware update mechanism
+- Clear Flash memory partitioning
+- Controlled and safe execution transfer
+- Firmware integrity assurance
+- Production-oriented embedded architecture
+
+---
+
+## License
+
+MIT License
