@@ -51,5 +51,29 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+#STM32CubeIDE
+Debug/
+Release/
+build/
+.settings/
+.metadata/
+*.launch
+*.log
+
+#Generated files
+*.o
+*.d
+*.elf
+*.bin
+*.map
+
+#CMSIS & HAL temp
+*.su
+*.cyclo
+
+#Python
+__pycache__/
+*.pyc
+
 # debug information files
 *.dwo
