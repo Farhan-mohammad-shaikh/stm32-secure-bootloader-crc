@@ -119,10 +119,10 @@ This ensures:
 ##  Firmware Upload Tool (Python Script)
 A Python script is provided to send the compiled firmware (.bin) file via UART.
 
-### Install Dependencies
+## Install Dependencies
 ```bash
 pip install pyserial
-
+```
 python firmware_sender.py firmware.bin /dev/ttyUSB0
 
 ##  CRC Integrity Verification
