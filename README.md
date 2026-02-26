@@ -114,18 +114,23 @@ This ensures:
 
 ---
 
-## 📷 Hardware Setup
+## Hardware Setup
 
-![Hardware](docs/hardware(application).jpg)
-![Hardware](docs/hardware(boot).jpg)
+![Hardware Boot](hardware(boot).jpeg)
+
+![Hardware Application](hardware(application).jpeg)
+
+---
 
 ##  Flash Memory Layout Verification
 
 ### Bootloader @ 0x08000000
-![Bootloader Flash](docs/Flash_bootloader.png)
+
+![Bootloader Flash](Flash_bootloader.png)
 
 ### Application @ 0x08010000
-![Application Flash](docs/Flash_application.png)
+
+![Application Flash](Flash_applicaiton.png)
 
 ##  Firmware Upload Tool (Python Script)
 A Python script is provided to send the compiled firmware (.bin) file via UART.
